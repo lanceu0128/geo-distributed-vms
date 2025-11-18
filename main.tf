@@ -18,6 +18,7 @@ variable "ssh_public_key" {
   default = "~/.ssh/id_rsa.pub"
 }
 
+// TODO use this again when we're ready
 variable "resource_groups" {
   description = "RGs, name prefixes, and locations."
   type = map(object({
@@ -37,11 +38,28 @@ data "azurerm_resource_group" "rgs" {
   name     = each.key
 }
 
-module "vm" {
-  for_each            = var.resource_groups
-  source              = "./modules/vm"
-  resource_group_name = each.key
-  location            = each.value.location
-  name_prefix         = each.value.prefix
-  ssh_public_key      = var.ssh_public_key
+module "east_us_region" {
+  source = "./modules/region"
+
+  name_prefix         = "geo-eastus"
+  location            = "eastus"
+  resource_group_name = "Geo-Distributed-VM-East-US"
+
+  vm_names            = ["vm1", "vm2"]
+
+  username       = "azureuser"
+  ssh_public_key = file("~/.ssh/id_rsa.pub")
+}
+
+module "west_us_region" {
+  source = "./modules/region"
+
+  name_prefix         = "geo-eastus"
+  location            = "eastus"
+  resource_group_name = "Geo-Distributed-VM-WestUS"
+
+  vm_names            = ["vm1", "vm2"]
+
+  username       = "azureuser"
+  ssh_public_key = file("~/.ssh/id_rsa.pub")
 }
