@@ -47,6 +47,14 @@ Worker nodes should have consistent settings when possible. All should contain a
 - *Monitoring Node* - Within one arbitrary region, serves as a host for Prometheus data and Grafana visualization.
     - Pull model exporter; will probe VM to communicate and collect metrics from other workers
 
+### "Fan-out" Exporter
+
+Flow of command:
+
+1. Every X seconds, monitor will probe VMs through a custom exporter.
+2. The custom exporter will blackbox probe all other worker IPs, and collect networking metrics from the communication.
+3. The custom exporter will return metrics back to Prometheus "flattened." That is: Prometheus should be able to understand that the one exporter outputs really represent multiple outputs.
+
 ### Communication
 
 Communication will be done over the internet using public IPs for the MVP/simplicity.
